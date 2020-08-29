@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -18,8 +19,10 @@ public class ConnectionClass {
 	String connDetails;
 	String username;
 	String password;
+	String envData;
 	Connection con;
 	File file = new File(System.getProperty("user.dir")+"/log.txt");
+	
 	BufferedWriter  output = null;
 	public ConnectionClass(String connDetails, String username, String password) {
 		//super();
@@ -29,17 +32,46 @@ public class ConnectionClass {
 	}
 	
     public void makeConnection()
-    {
+    {	
     	try {
-    		con = DriverManager.getConnection
-("jdbc:oracle:thin:@localhost:1521:xe",System.getProperty("system.UserId")
-		,System.getProperty("system.Password"));
+			readFileAsString();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+    	try {
+    		System.out.println("UserId-"+getUserid());
+    		System.out.println("Pwd-"+getPwd());
+con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe",
+		getUserid(),getPwd());
+System.getProperty("ENV Userid -"+ "env.UserId");
+System.getProperty("ENV Password -"+"env.Password");
+System.getProperty("System Userid -"+ "system.UserId");
+System.getProperty("System Password -"+"system.Password");
     		//("jdbc:oracle:thin:@localhost:1521:xe","hr","password23#@");
 		} catch (SQLException e) {
 			e.printStackTrace(); System.getProperty("system.UserId");
 		}
     	
     }
+    
+    public void readFileAsString()throws Exception 
+    { 
+    	String fileName=System.getProperty("user.dir")+"/User_Details.txt";
+    	envData = new String(Files.readAllBytes(Paths.get(fileName)));
+    }
+    
+    public String getUserid(){
+    	String envDetails[]=envData.split("\n");
+    	String userDetails[]=envDetails[0].split(":");
+    	return userDetails[1].trim();
+    }
+    
+    public String getPwd(){
+    	String envDetails[]=envData.split("\n");
+    	String pwdDetails[]=envDetails[1].split(":");
+    	return pwdDetails[1].trim();
+    }
+     
     
     public void runQuery(){
     	Statement stmt = null;
