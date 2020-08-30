@@ -12,6 +12,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.apache.log4j.Logger;
+
 //import javax.swing.JOptionPane;
 
 public class ConnectionClass {
@@ -21,7 +23,8 @@ public class ConnectionClass {
 	String password;
 	String envData;
 	Connection con;
-	File file = new File(System.getProperty("user.dir")+"/log.txt");
+	
+	static Logger log = Logger.getLogger(ConnectionClass.class); 
 	
 	BufferedWriter  output = null;
 	public ConnectionClass(String connDetails, String username, String password) {
@@ -39,14 +42,10 @@ public class ConnectionClass {
 			e1.printStackTrace();
 		}
     	try {
-    		System.out.println("UserId-"+getUserid());
-    		System.out.println("Pwd-"+getPwd());
+    		log.info("UserId-"+getUserid());
+    		log.info("Pwd-"+getPwd());
 con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe",
 		getUserid(),getPwd());
-System.getProperty("ENV Userid -"+ "env.UserId");
-System.getProperty("ENV Password -"+"env.Password");
-System.getProperty("System Userid -"+ "system.UserId");
-System.getProperty("System Password -"+"system.Password");
     		//("jdbc:oracle:thin:@localhost:1521:xe","hr","password23#@");
 		} catch (SQLException e) {
 			e.printStackTrace(); System.getProperty("system.UserId");
@@ -75,12 +74,6 @@ System.getProperty("System Password -"+"system.Password");
     
     public void runQuery(){
     	Statement stmt = null;
-    	try {
-			output = new BufferedWriter(new FileWriter(file));
-		} catch (IOException e4) {
-			// TODO Auto-generated catch block
-			e4.printStackTrace();
-		}
 		try {
 			stmt = con.createStatement();
 		} catch (SQLException e3) {
@@ -96,16 +89,12 @@ System.getProperty("System Password -"+"system.Password");
 			e2.printStackTrace();
 		}
     	try {
+    		log.info("Number of records - "+rs.getFetchSize());
     		System.out.println("Number of records - "+rs.getFetchSize());
     		//JOptionPane.showMessageDialog(null,"Number of records - "+rs.getFetchSize());
 			while(rs.next()){
+				log.info(rs.getInt(1)+"  "+rs.getString(2)+"  "+rs.getString(3));
 				System.out.println(rs.getInt(1)+"  "+rs.getString(2)+"  "+rs.getString(3));
-			try {
-				output.write("Hi");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 			}
 			//JOptionPane.showMessageDialog(null,rs.getInt(1)+"  "+rs.getString(2)+"  "+rs.getString(3));
 		} catch (SQLException e1) {
